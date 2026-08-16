@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iostream>
 
 #include "APInt.h"
 
@@ -60,6 +61,13 @@ std::uint64_t APInt::getZExtValue() const {
     return result;
 }
 
+// Print from most significant bit (bitWidth_-1) down to 0.
+void APInt::printBinary(std::ostream& os) const {
+    for (std::size_t i = bitWidth_; i-- > 0; ) {
+        os << (getBit(i) ? '1' : '0');
+    }
+}
+
 bool APInt::getBit(std::size_t idx) const {
     if (idx >= bitWidth_) {
         throw std::out_of_range("bit index out of range");
@@ -89,12 +97,14 @@ APInt APInt::operator+(const APInt& other) const {
         throw std::invalid_argument("operand bit widths must match for addition");
     }
 
+    std::size_t nWords = numWordsForBits(bitWidth_);
     APInt result(bitWidth_, 0);
-    std::size_t n = std::max(words_.size(), other.words_.size());
-    result.words_.assign(n, 0);
+    if (result.words_.size() < nWords) {
+        result.words_.resize(nWords, 0);
+    }
 
     std::uint64_t carry = 0;
-    for (std::size_t i = 0; i < n; ++i) {
+    for (std::size_t i = 0; i < nWords; ++i) {
         std::uint64_t a = (i < words_.size()) ? words_[i] : 0;
         std::uint64_t b = (i < other.words_.size()) ? other.words_[i] : 0;
 
@@ -116,12 +126,14 @@ APInt APInt::operator-(const APInt& other) const {
         throw std::invalid_argument("operand bit widths must match for subtraction");
     }
 
+    std::size_t nWords = numWordsForBits(bitWidth_);
     APInt result(bitWidth_, 0);
-    std::size_t n = std::max(words_.size(), other.words_.size());
-    result.words_.assign(n, 0);
+    if (result.words_.size() < nWords) {
+        result.words_.resize(nWords, 0);
+    }
 
     std::uint64_t borrow = 0;
-    for (std::size_t i = 0; i < n; ++i) {
+    for (std::size_t i = 0; i < nWords; ++i) {
         std::uint64_t a = (i < words_.size()) ? words_[i] : 0;
         std::uint64_t b = (i < other.words_.size()) ? other.words_[i] : 0;
 
@@ -139,14 +151,20 @@ APInt APInt::operator-(const APInt& other) const {
 }
 
 APInt APInt::operator*(const APInt& other) const {
-    if (bitWidth_ != other.bitWidth_) {
+    if (bitWidth_ != other.getBitWidth()) {
         throw std::invalid_argument("operand bit widths must match for multiplication");
     }
 
-    APInt result(bitWidth_, 0);
-    std::size_t nWords = result.words_.size();
+    std::size_t nWords = numWordsForBits(bitWidth_);
 
-    // Simple schoolbook multiplication.
+    // Create result with the correct number of words, bypassing canonicalization for now.
+    APInt result(bitWidth_, 0);
+    // Ensure result has exactly nWords, even if they are all zero.
+    if (result.words_.size() < nWords) {
+        result.words_.resize(nWords, 0);
+    }
+
+    // Schoolbook multiplication.
     for (std::size_t i = 0; i < words_.size(); ++i) {
         if (words_[i] == 0) continue;
         std::uint64_t carry = 0;

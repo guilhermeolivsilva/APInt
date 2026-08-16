@@ -15,6 +15,9 @@ public:
     // Get the value as a zero-extended 64-bit integer.
     std::uint64_t getZExtValue() const;
 
+    // Print the binary representation of the APInt to the given output stream.
+    void printBinary(std::ostream& os) const;
+
     // Bit access.
     bool getBit(std::size_t idx) const;
     void setBit(std::size_t idx, bool val);

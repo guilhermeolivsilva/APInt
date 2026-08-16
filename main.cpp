@@ -10,11 +10,25 @@ int main() {
     APInt diff = a - b;
     APInt prod = a * b;
 
-    std::cout << "a      = " << a.getZExtValue() << "\n";
-    std::cout << "b      = " << b.getZExtValue() << "\n";
-    std::cout << "a + b  = " << sum.getZExtValue() << "\n";
-    std::cout << "a - b  = " << diff.getZExtValue() << "\n";
-    std::cout << "a * b  = " << prod.getZExtValue() << "\n";
+    std::cout << "a      = ";
+    a.printBinary(std::cout);
+    std::cout << "\n";
+
+    std::cout << "b      = ";
+    b.printBinary(std::cout);
+    std::cout << "\n";
+
+    std::cout << "a + b  = ";
+    sum.printBinary(std::cout);
+    std::cout << "\n";
+
+    std::cout << "a - b  = ";
+    diff.printBinary(std::cout);
+    std::cout << "\n";
+
+    std::cout << "a * b  = ";
+    prod.printBinary(std::cout);
+    std::cout << "\n";
 
     // Demo with 128 bits.
     // (`x` and `y` are 2^64 - 1, so `x * y` requires more than 64 bits to represent.)
@@ -23,9 +37,17 @@ int main() {
     APInt p = x * y;
 
     std::cout << "\n128-bit demo:\n";
-    std::cout << "x      = " << x.getZExtValue() << " (low 64 bits)\n";
-    std::cout << "y      = " << y.getZExtValue() << " (low 64 bits)\n";
-    std::cout << "x * y  = " << p.getZExtValue() << " (low 64 bits)\n";
+    std::cout << "x      = ";
+    x.printBinary(std::cout);
+    std::cout << "\n";
+
+    std::cout << "y      = ";
+    y.printBinary(std::cout);
+    std::cout << "\n";
+
+    std::cout << "x * y  = ";
+    p.printBinary(std::cout);
+    std::cout << "\n";
 
     return 0;
 }
